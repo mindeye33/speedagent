@@ -3,6 +3,22 @@
 
 Minimal `pydantic_ai` chat agent with a Python REPL tool.
 
+## Security warning (USE AT YOUR OWN RISK)
+
+This project intentionally exposes powerful tools to the model, including:
+
+- an unrestricted Python REPL (arbitrary Python execution)
+- an unrestricted `bash` command runner (arbitrary shell command execution)
+
+That means prompts (and model/tool output) can:
+
+- read/modify/delete files accessible to your user account
+- execute arbitrary programs and install packages
+- access environment variables and other secrets available on the machine
+- make network requests (directly or via installed tools)
+
+Only run this on a machine/environment you trust and are willing to risk. Do not deploy it to the public internet. Prefer a sandboxed, disposable environment (e.g., a container/VM) with minimal permissions and no sensitive credentials.
+
 ## Setup
 
 Sync dependencies:
@@ -23,12 +39,6 @@ Or create a `.env` file in the project root:
 
 ```bash
 OPENAI_API_KEY=...
-```
-
-Optional model override:
-
-```bash
-export SPEEDAGENT_MODEL=gpt-4.1-mini
 ```
 
 Start the CLI:
