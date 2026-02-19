@@ -6,7 +6,13 @@ from langchain_experimental.tools.python.tool import PythonREPLTool
 from pydantic_ai.ext.langchain import tool_from_langchain
 from pydantic_ai.builtin_tools import WebSearchTool
 from pydantic_ai import ModelRetry
+import tools
 import subprocess
+
+import logfire
+logfire.configure()
+logfire.instrument_pydantic_ai()
+logfire.instrument_httpx(capture_all=True)
 
 python_tool = tool_from_langchain(PythonREPLTool())
 
@@ -17,9 +23,11 @@ You're a computational chemistry agent that interprets user intent and executes 
 * execute your Python code via the `Python_REPL` tool. 
 * use web search, for example: for code examples of pyscf on https://github.com/pyscf/pyscf/tree/master/examples. 
 * execute bash commands via the `bash` tool, e.g. to install missing Python packages with "uv" like: "uv add numpy", etc.
+* add new tools to yourself, by adding them to the `tools` directory as top-level functions. After adding any new tool, make a unit test in the tests directory, and make sure it passes the tests.  
+YOUR OWN SOURCE CODE is in the `agent.py` file, so you can modify your own instructions.
 Only save new results/figures in "work_dir".
-""",
-    tools=[python_tool],
+    """,
+    tools=[python_tool] + tools.load_tools(name_style="module.func"),
     builtin_tools=[WebSearchTool()],
     retries=5,
 )
@@ -30,9 +38,9 @@ def bash(command: str) -> str:
     try:
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
         print(f"Ran bash command: {command}\nReturn code: {result.returncode}\nStdout: {result.stdout}\nStderr: {result.stderr}")
+        return result.stdout + result.stderr    
     except Exception as e:
         raise ModelRetry(f"Error running bash command: {e}") from e
-    return result.stdout + result.stderr
 
 app = agent.to_web(
     models={"GPT 5": "openai-responses:gpt-5.2"},
