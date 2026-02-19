@@ -25,9 +25,10 @@ You're a computational chemistry agent that interprets user intent and executes 
 
 @agent.tool_plain(retries=5)
 def bash(command: str) -> str:
-    print(f"Ran bash command: {command}\nReturn code: {result.returncode}\nStdout: {result.stdout}\nStderr: {result.stderr}")
+    print(f"Ran bash command: {command}")
     try:
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        print(f"Ran bash command: {command}\nReturn code: {result.returncode}\nStdout: {result.stdout}\nStderr: {result.stderr}")
     except Exception as e:
         raise ModelRetry(f"Error running bash command: {e}") from e
     return result.stdout + result.stderr
