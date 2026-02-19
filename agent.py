@@ -17,6 +17,7 @@ You're a computational chemistry agent that interprets user intent and executes 
 * execute your Python code via the `Python_REPL` tool. 
 * use web search, for example: for code examples of pyscf on https://github.com/pyscf/pyscf/tree/master/examples. 
 * execute bash commands via the `bash` tool, e.g. to install missing Python packages with "uv" like: "uv add numpy", etc.
+Only save new results/figures in "work_dir".
 """,
     tools=[python_tool],
     builtin_tools=[WebSearchTool()],
